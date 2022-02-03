@@ -1,0 +1,9 @@
+1. init
+2. longpoll - if necessary to find
+3. get info from client's account
+4. longpoll - ask info if needed
+5. write info to database
+6. write info of other user to database
+7. make matches - if age, city, interests and groups are common
+8. get photo from necessary account
+9. longpoll -send photo to client ask if ok then shut down
