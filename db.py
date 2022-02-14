@@ -1,25 +1,92 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from model import Base
+from bot_longpoll import write_msg
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker
+from model import *
+import vk_api
+from vk_api.longpoll import VkLongPoll, VkEventType
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
 
 with open('txt/DB_U.txt', encoding='utf-8') as f:
     db_uri = f.readline()
 
+Base = declarative_base()
 engine = create_engine(db_uri)
 
-Base.metadata.create_all(engine)
-
 Session = sessionmaker(bind=engine)
-s = Session()
+
+with open('txt/token.txt', encoding='utf-8') as f:
+    token = f.readline()
+
+vk_session = vk_api.VkApi(token=token)
+longpoll = VkLongPoll(vk_session)
+
+session = Session()
+con = engine.connect()
 
 
-def add_client(user_id, data, offset=0):
-    session = Session()
-    user = session.query(User).filter(User.user_vk_id == user_id).first()
-    if not user:
-        user_vk_id = User(user_vk_id=user_id, data=data, offset=offset)
-        session.add(user_vk_id)
+# REGISTER NEW CLIENT
+def sign_in(vk_id):
+    try:
+        new_user = User(
+            vk_id=vk_id
+        )
+        session.add(new_user)
         session.commit()
-    return
+        return True
+    except (IntegrityError, InvalidRequestError):
+        return False
+
+
+# TO ADD LIKED USER TO DB
+def add_user(event_id, vk_id, first_name, surname, city, link, id_user):
+    try:
+        new_user = MatchedUser(
+            vk_id=vk_id,
+            f_name=first_name,
+            s_name=surname,
+            city=city,
+            link=link,
+            id_user=id_user
+        )
+        session.add(new_user)
+        session.commit()
+        write_msg(event_id, 'ADDED USER TO MATCH')
+        return True
+    except(IntegrityError, InvalidRequestError):
+        write_msg(event_id, 'Already in the list')
+        return False
+
+
+# TO ADD PHOTO OF THE MATCH TO DB
+def add_match_photo(event_id, link_photo, likes_amount, id_match_user):
+    try:
+        new_user = Photoes(
+            link_photo=link_photo,
+            likes_amount=likes_amount,
+            id_match_user=id_match_user
+        )
+        session.add(new_user)
+        session.commit()
+        write_msg(event_id, 'PHOTOES OF MATCH ADDED TO DB')
+        return True
+    except(IntegrityError, InvalidRequestError):
+        write_msg(event_id, 'COULD NOT SAVE PHOTOES')
+        return False
+
+
+# TO REMOVE FROM MATCHES
+def remove_from_matches(id_):
+    this_user = session.query(MatchedUser).filter_by(vk_id=id_).first()
+    session.delete(this_user)
+    session.commit()
+
+
+if __name__ == '__main__':
+    Base.metadata.create_all(engine)
+
+
+
+
+
 

@@ -35,7 +35,7 @@ class GetClientInfo:
 
         def ask_client_about_prefs(user_id, message):
             vk.method('messages.send',
-                      {'user_id': user_id, 'message': message, 'random_id': randrange(10 ** 7))
+                      {'user_id': user_id, 'message': message, 'random_id': randrange(10 ** 7)}
 
 
 
