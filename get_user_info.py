@@ -39,6 +39,27 @@ class GetClientInfo:
 
 
 
+
+
+        def search_for_matches(sex, start_age, max_age, city):
+            pass
+
+
+        def make_json(data):
+            pass
+
+        def get_photo():
+            pass
+
+        def sort_by_likes()
+            pass
+
+
+
+
+
+
+
         def client_prefs(self):
             vk_session1 = vk_api.VkApi(token=self.token)
             longpoll1 = VkLongPoll(vk_session1)

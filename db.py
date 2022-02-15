@@ -82,6 +82,13 @@ def remove_from_matches(id_):
     session.commit()
 
 
+# CHECK IF USER IS IN MATCHES ALREADY
+def is_in_matched_users(ids):
+    this_user_id = session.query(User).filter_by(vk_id=ids).first()
+    all_list = session.query(User).filter_by(vk_id=this_user_id).first()
+    return all_list
+
+
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
 
