@@ -100,24 +100,30 @@ if __name__ == '__main__':
                         continue
                     sorted_user_photo = sort_by_likes(user_photo)
                     # print sorted data
-
-
-
-
-
-
-
-for event in longpoll.listen():
-    if event.type == VkEventType.MESSAGE_NEW:
-        if event.to_me:
-            text == event.text.lower()
-            user = GetClientInfo(event.user_id)
-            if text == 'hi' or text == 'привет' or text == 'здравствуйте':
-                dialog(event.user_id, f"Здравствуйте, {event.user_id}")
-            elif text == 'не нужно' or text == 'до свидания':
-                dialog(event.user_id, "Возможно, в другой раз?")
-            elif text == 'подбери мне пару':
-                dialog(event.user_id, "Отлично, давайте начинать. Для начала я посмотрю Вашу информацию")
-                user = GetClientInfo(event.user_id)
-
+                    write_msg(user_id, f'\n{result[i][0]} {result[i][1]} {result[i][2]}')
+                    try:
+                        write_msg(user_id, f'фото',
+                                  attachment=','.join([sorted_user_photo[-1][1], sorted_user_photo[-2][1], sorted_user_photo[-3][1]]))
+                    except IndexError:
+                        for photo in range(len(sorted_user_photo)):
+                            write_msg(user_id, f'фото:', attachment=sorted_user_photo[photo][1])
+                    write_msg(user_id, '1 - add, 2 - remove, 0 - next\nq - quit')
+                    msg_text, user_id = bot()
+                    if msg_text == '0':
+                        if i >= len(result) - 1:
+                            dialog()
+#                     add to matches
+                    elif msg_text == '1':
+                        if i >= len(result) - 1:
+                            dialog()
+                            break
+                        try:
+                            add_user(user_id, result[i][3], result[i][1], result[i][0], city, result[i][2], this_user_id.id)
+                            add_match_photo(user_id, sorted_user_photo[0][1], sorted_user_photo[0][0], this_user_id.id)
+                        except AttributeError:
+                            write_msg(user_id, 'You are not signed in, write "hi" or "привет" to sign in vkinder')
+                            break
+                    elif msg_text.lower() == 'q':
+                        write_msg(user_id, 'Goodbye!')
+                        break
 

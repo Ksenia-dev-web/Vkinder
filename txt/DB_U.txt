@@ -1,1 +1,1 @@
-'postgres+psycopg2://postgres:123@localhost:5432/users'
+'postgres+psycopg2://libre:123@localhost:5432/users'
